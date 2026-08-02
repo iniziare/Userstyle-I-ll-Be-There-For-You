@@ -1,8 +1,8 @@
 /* ==UserStyle==
 @name           Tumblr Dashboard - I'll Be There For You
 @namespace      github.com/openstyles/stylus
-@version        1.1.0
-@description    Ground-up dark rebuild of the Tumblr dashboard. Rough base: one #202020 everywhere, Helvetica, 12px.
+@version        1.2.0
+@description    Ground-up dark rebuild of the Tumblr dashboard. Rough base: one #202020 everywhere, Helvetica, 12px. Settings-page toggle switches also restyled to dark grey (on) / light grey (off).
 @author         Me
 @updateURL      https://raw.githubusercontent.com/iniziare/Userstyle-I-ll-Be-There-For-You/main/bethereforyou.user.css
 ==/UserStyle== */
@@ -123,6 +123,17 @@
     --accent-tint-strong: rgba(var(--dark-bg-rgb), 0.6); /* accent hover/pressed states    */
     --accent-tint:        rgba(var(--dark-bg-rgb), 0.2); /* faint accent wash              */
     --accent-fg:          var(--main-fg);               /* text/icons on accent-bg elements */
+
+    /* de-blue the notes/comments tab bar ("0 comments", "0 reblogs",
+       "5 likes") — selected tab uses --brand-blue, hover uses
+       --brand-blue-hover. Repoint to dark grey. */
+    --brand-blue:         var(--dark-bg);
+    --brand-blue-hover:   #333333;
+
+    /* de-blue toggle switches / checkboxes — "on" state uses --blue.
+       White = "lit up" on dark chrome, consistent with active tab
+       underline and notification badge. "Off" stays its natural grey. */
+    --blue:               120, 120, 120;
   }
 
   /* POST NOW BUTTON — the .xved4 wrapper uses background:var(--accent)
@@ -362,6 +373,8 @@
     justify-content: center !important;
     padding-top: 4px !important;
     padding-bottom: 4px !important;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
   }
 
   /* right sidebar padding — 10px breathing room */
@@ -464,6 +477,24 @@
   button[aria-label="Follow"],
   button[aria-label="Follow"] span {
     color: var(--main-fg) !important;
+    background-color: var(--dark-bg) !important;
+  }
+  button[aria-label="Follow"] {
+    border: 1px solid var(--line) !important;
+    padding: 7px 15px !important;
+  }
+  /* popover Follow button — the span has INLINE styles using
+     --blog-background-color and --blog-contrasting-link-color
+     (the blog's own theme). Our !important overrides stomp on
+     inline styles, so we explicitly point back at those vars. */
+  [data-popper-placement] button[aria-label="Follow"] {
+    background: transparent !important;
+    border: none !important;
+  }
+  [data-popper-placement] button[aria-label="Follow"] span {
+    color: var(--blog-background-color) !important;
+    background-color: var(--blog-contrasting-link-color) !important;
+    padding: 4px 10px !important;
   }
   footer a,
   [role="contentinfo"] a {
@@ -506,6 +537,38 @@
     color: var(--chrome-fg-secondary) !important;
   }
 
+  /* XKit modals (Tag Replacer, Limit Checker, etc.) — breathing room
+     + subtle border to frame against the dashboard. All XKit popups
+     render inside #xkit-modal[role="dialog"]. */
+  #xkit-modal {
+    padding: 20px !important;
+    border: 1px solid var(--line) !important;
+    max-width: 90vw !important;
+    width: fit-content !important;
+    height: auto !important;
+    max-height: 80vh !important;
+    margin: auto !important;
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    overflow-y: auto !important;
+  }
+  #xkit-modal .message,
+  #xkit-modal form {
+    padding: 15px !important;
+    margin-bottom: 15px !important;
+  }
+  /* XKit modal buttons — dark bg, white text, subtle border */
+  #xkit-modal .buttons button,
+  #xkit-modal .buttons a,
+  #xkit-modal .buttons input {
+    background-color: var(--dark-bg) !important;
+    color: var(--main-fg) !important;
+    border: 1px solid var(--line) !important;
+    padding: 5px 12px !important;
+  }
+
   /* sidebar headings ("Check out these blogs", "Radar", etc.) and
      "Explore all of Tumblr" link — pure white to stand out from the
      dimmer XKit sub-items and chrome-fg grey. */
@@ -514,11 +577,49 @@
   a.I_SFh {
     color: var(--main-fg) !important;
   }
+  a.I_SFh {
+    display: none !important;
+  }
+
+  /* REPLY SEND ARROW — the airplane icon in the comment reply field.
+     Dark to match the white card, slightly smaller than default. */
+  button[data-testid="reply-button"] svg,
+  button[data-testid="reply-button"] {
+    --icon-color-primary: var(--post-fg) !important;
+    color: var(--post-fg) !important;
+  }
+  button[data-testid="reply-button"] svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+  /* reply button container — match inspector padding */
+  .v6i4P {
+    padding-bottom: 7px !important;
+  }
+
+  /* POST FOOTER ICONS — comment, reblog, like, share are 24×24 by
+     default. Shrink to 18px for a cleaner look. Stable hook:
+     footer[aria-label="Post footer"] */
+  footer[aria-label="Post footer"] svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+  /* "Follow post" button in the notes/activity panel — match size */
+  button[aria-label="Follow post"] svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
 
   /* collapse empty .FZkjV spacer divs above XKit / between sidebar
      sections — they add ~38px of dead space. Hashed — flagged. */
   .FZkjV {
     margin-bottom: 0 !important;
+  }
+
+  /* "Check out these blogs" dismiss column — the × button + Follow
+     sit flush against the sidebar frame line. Add breathing room. */
+  .SbeG8.Mk7yS {
+    padding-left: 8px !important;
   }
   /* ============================================================
      18. SIDEBAR DROPDOWN OVERRIDES
@@ -592,6 +693,35 @@
     color: var(--dark-bg) !important;
     font-size: 11px !important;
     line-height: 1 !important;
+  }
+
+  /* ============================================================
+     22. SETTINGS TOGGLES  —  Custom Theme / Likes / Following etc.
+     span.UZrDG is the toggle pill on the Settings page. The parent
+     <label class="xmMz6"> carries aria-checked="true"/"false" — a
+     stable state hook. Off state (false) → a dedicated light grey
+     (#eeeeee) — went through --tab-idle (#efefef) and #cccccc
+     first, still read too dark against the white settings card, so
+     this gets its own value instead of reusing that token. On
+     state (true) → var(--dark-bg), same reference used everywhere
+     else for "lit up" (matches the active tab underline /
+     notification badge treatment). Overrides both the base rule
+     (which uses --content-fg-secondary) and the inline on-state
+     style (which uses --blue) — both shared tokens we don't want
+     to touch globally just for this one widget.
+     Hashed class — flagged for refresh. NOTE: aria-checked shows up
+     on the <label> for some toggles and on the <input> for others,
+     so both are targeted to be safe. Off-state progression: #eeeeee
+     → too light, #cccccc → too dark, #dcdcdc → too light, #d0d0d0
+     → close, #c4c4c4 → close; settled on #b8b8b8.
+     ============================================================ */
+  label[aria-checked="false"] span.UZrDG,
+  label:has(input[aria-checked="false"]) span.UZrDG {
+    background-color: #b8b8b8 !important;
+  }
+  label[aria-checked="true"] span.UZrDG,
+  label:has(input[aria-checked="true"]) span.UZrDG {
+    background-color: var(--dark-bg) !important;
   }
 
 }
