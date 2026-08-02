@@ -1,10 +1,10 @@
 /* ==UserStyle==
 @name           Tumblr Dashboard - I'll Be There For You
 @namespace      github.com/openstyles/stylus
-@version        1.0.0
+@version        1.1.0
 @description    Ground-up dark rebuild of the Tumblr dashboard. Rough base: one #202020 everywhere, Helvetica, 12px.
 @author         Me
-@updateURL      https://raw.githubusercontent.com/iniziare/Userstyle-I-Il-Be-There-For-You/main/bethereforyou.user.css
+@updateURL      https://raw.githubusercontent.com/iniziare/Userstyle-I-ll-Be-There-For-You/main/bethereforyou.user.css
 ==/UserStyle== */
 
 /* ------------------------------------------------------------
@@ -44,6 +44,19 @@
     --line:         rgba(255, 255, 255, 0.09);  /* subtle border / divider colour on dark */
     --pad:          14px;                        /* inner breathing room (e.g. sidebar ↔ frame) */
     --gap:          20px;                        /* vertical rhythm between stacked blocks */
+
+    /* activity-popover tab colours.
+       --content-ui-hover (selected tab, rgba(26,48,73,1)) IS on the
+       dark dashboard chrome, so its grayscale (rgb(44,44,44)) is right.
+       --content-tint (idle tabs, rgba(76,94,114,1)) is DIFFERENT: that
+       popover card itself is one of Tumblr's own LIGHT-theme surfaces
+       (white bg), so a pure grayscale of its raw value (rgb(91,91,91))
+       reads too dark/muddy against white. Idle tabs instead get a
+       light neutral grey — same "no blue hue" intent, just tuned for
+       a light card instead of the dark dashboard. */
+    --tab-idle:       #efefef;
+    --tab-active:     #2c2c2c;
+    --tab-hover-tint: rgba(21, 21, 21, 0.1);
   }
 
   /* ============================================================
@@ -61,7 +74,9 @@
     --content-panel: var(--post-bg);       /* the post cards — white                     */
 
     /* text inside the (white) post cards */
-    --content-fg:    var(--post-fg);
+    --content-fg:           var(--post-fg);
+    --content-fg-secondary: #555555;   /* de-blued secondary text on light surfaces */
+    --content-fg-tertiary:  #888888;   /* de-blued tertiary text on light surfaces  */
 
     /* fonts */
     --font-family:         var(--main-font);
@@ -76,6 +91,83 @@
     --overlay-tint:        rgba(var(--dark-bg-rgb), 0.2);
     --overlay-tint-strong: rgba(var(--dark-bg-rgb), 0.6);
     --overlay-tint-heavy:  rgba(var(--dark-bg-rgb), 0.8);
+
+    /* de-blue the activity/notification tab popover ("All / Mentions /
+       Reblogs / Replies"): Tumblr's --content-ui / --content-ui-hover
+       paint the selected tab, --content-tint / --content-tint-strong
+       paint the idle tabs — all four carry a navy tint. Selected tab
+       repointed at a true grayscale of Tumblr's own value (dark
+       dashboard chrome). Idle tabs repointed at a light neutral grey
+       instead — that popover card is one of Tumblr's own light-theme
+       surfaces (white bg), so a strict grayscale of its navy read too
+       dark there; light-but-hueless is the equivalent fix for a light
+       surface. Part of the standing "remove all blue" goal — --accent
+       and other blue spots elsewhere on the dashboard still pending. */
+    --content-ui:          var(--dark-bg);
+    --content-ui-hover:    var(--tab-active);
+    --content-tint:        var(--tab-idle);
+    --content-tint-strong: var(--tab-hover-tint);
+
+    /* GLOBAL DE-BLUE: --accent is Tumblr's master blue token — it
+       colours the active-tab underline (already overridden in §9),
+       icon tints, follow buttons, links, "Post now", checkmarks, etc.
+       Setting it to white works on dark chrome; on light surfaces
+       (white cards/dropdowns) icons would vanish, so --icon-color-
+       primary is pointed at a visible neutral dark grey separately.
+       This is the broadest single de-blue lever — individual elements
+       that still show blue after this are using a hardcoded rgba and
+       need per-element overrides (flag them as they come up). */
+    --accent: 255, 255, 255;           /* RGB triplet — Tumblr uses rgb(var(--accent)) */
+    --deprecated-accent: 255, 255, 255; /* older accent triplet — activity graph + stat borders */
+    --accent-tint-heavy:  var(--dark-bg);               /* "Post now" button bg            */
+    --accent-tint-strong: rgba(var(--dark-bg-rgb), 0.6); /* accent hover/pressed states    */
+    --accent-tint:        rgba(var(--dark-bg-rgb), 0.2); /* faint accent wash              */
+    --accent-fg:          var(--main-fg);               /* text/icons on accent-bg elements */
+  }
+
+  /* POST NOW BUTTON — the .xved4 wrapper uses background:var(--accent)
+     directly (not --accent-tint-heavy), so it went white when we de-
+     blued --accent. Force dark bg + white text. Hashed — flagged.
+     NOTE: only target the direct button + its span, NOT descendants
+     inside the dropdown (.sGoIj) which sits on a white card. */
+  .xved4 {
+    background: var(--dark-bg) !important;
+  }
+  .xved4 > button,
+  .xved4 > button span {
+    color: var(--main-fg) !important;
+  }
+  /* caret arrow + divider line next to "Post now" */
+  .xved4 > span > span > button svg,
+  .xved4 > span > span > button,
+  .xved4 > span > span {
+    color: var(--main-fg) !important;
+    --icon-color-primary: var(--main-fg) !important;
+    border-color: var(--main-fg) !important;
+  }
+
+  /* POST OPTIONS DROPDOWN — the "Post now / Add to queue / Save as
+     draft" menu sits on a white card inside .xved4. Dark text by
+     default, dark highlight on hover with white text.
+     .sGoIj = dropdown container, .yP2Ub = each option row.
+     Hashed — flagged. */
+  .sGoIj,
+  .sGoIj li,
+  .sGoIj li span,
+  .sGoIj li div {
+    color: var(--post-fg) !important;
+  }
+  .sGoIj svg {
+    --icon-color-primary: var(--post-fg) !important;
+  }
+  .sGoIj li:hover,
+  .sGoIj li:hover span,
+  .sGoIj li:hover div {
+    color: var(--main-fg) !important;
+    background-color: var(--dark-bg) !important;
+  }
+  .sGoIj li:hover svg {
+    --icon-color-primary: var(--main-fg) !important;
   }
 
   /* ============================================================
@@ -99,6 +191,29 @@
   }
   body *:not(.oDBam *) {
     font-size: var(--base-size) !important;
+  }
+
+  /* EDITOR TOOLBAR — pressed/active formatting buttons (Bold, Italic,
+     Small…) use background:var(--accent) which went white-on-white.
+     Give pressed state a visible dark bg. aria-pressed="true" is a
+     stable hook. */
+  .oDBam button[aria-pressed="true"],
+  button[aria-pressed="true"].PD0uZ {
+    background-color: var(--dark-bg) !important;
+    --icon-color-primary: var(--main-fg) !important;
+  }
+
+  /* EDITOR SMALL TEXT — <small> inside the editor (.oDBam) is excluded
+     from the global 12px floor so formatting works, but its natural
+     size (13px) is too big. Pin it to 12px with tighter line-height. */
+  .oDBam small {
+    font-size: var(--base-size) !important;
+  }
+
+  /* EDITOR LINE-HEIGHT — the rich-text editing area (.oDBam .rich-text)
+     defaults to 1.5, which is too loose. Tighten to 1.2. */
+  .oDBam .rich-text {
+    line-height: 1.2 !important;
   }
 
   /* ============================================================
@@ -368,11 +483,57 @@
   }
 
   /* ============================================================
-     18. WHITE LINKS  —  sidebar + footer
+     18b. XKIT SIDEBAR  —  clean up heading borders + dim sub-items
+     XKit injects sidebar widgets (Limit Checker, Tag Replacer…)
+     as div.xkit-sidebar-item with an h1 heading + ul/li sub-items.
+     The h1's border-bottom stretches past the sidebar's inner
+     padding — remove it entirely. Sub-items ("Check daily limits",
+     "Replace a tag") get dimmer text to separate them from the
+     heading without a line. Stable hooks: #xkit-sidebar, .xkit-
+     sidebar-item.
      ============================================================ */
-  aside a,
-  aside span {
+  .xkit-sidebar-item > h1 {
+    border-bottom: none !important;
+    padding-bottom: 2px !important;
+    margin-bottom: 2px !important;
+  }
+  .xkit-sidebar-item ul {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+  .xkit-sidebar-item li,
+  .xkit-sidebar-item li a {
+    color: var(--chrome-fg-secondary) !important;
+  }
+
+  /* sidebar headings ("Check out these blogs", "Radar", etc.) and
+     "Explore all of Tumblr" link — pure white to stand out from the
+     dimmer XKit sub-items and chrome-fg grey. */
+  aside h1,
+  aside h4:not(.pBLQq),
+  a.I_SFh {
     color: var(--main-fg) !important;
+  }
+
+  /* collapse empty .FZkjV spacer divs above XKit / between sidebar
+     sections — they add ~38px of dead space. Hashed — flagged. */
+  .FZkjV {
+    margin-bottom: 0 !important;
+  }
+  /* ============================================================
+     18. SIDEBAR DROPDOWN OVERRIDES
+     Search-result dropdowns (.pBLQq) sit on a WHITE card — dark text
+     by default, white on hover. .wmRou (community rows) hover gets a
+     barely-lighter highlight. Sidebar text on dark chrome is handled
+     by the --chrome-fg tokens in section 17 — no broad aside rule
+     needed.
+     ============================================================ */
+  .pBLQq:hover {
+    color: var(--main-fg) !important;
+    background-color: #aaaaaa !important;
+  }
+  .wmRou:hover {
+    background-color: #2a2a2a !important;
   }
 
   /* ============================================================
@@ -395,7 +556,7 @@
     margin: 0 !important;
     margin-left: -10px !important;
     margin-top: -4px !important;
-    padding: 8px 0 8px 25px !important;
+    padding: 8px 0 8px 5px !important;
   }
 
   /* ============================================================
