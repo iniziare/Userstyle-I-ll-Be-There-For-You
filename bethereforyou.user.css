@@ -1,26 +1,12 @@
 /* ==UserStyle==
 @name           Tumblr Dashboard - I'll Be There For You
 @namespace      github.com/openstyles/stylus
-@version        1.2.0
-@description    Ground-up dark rebuild of the Tumblr dashboard.
+@version        1.3.0
+@description    Ground-up dark rebuild of the Tumblr dashboard. 
 @author         iniziare
 @updateURL      https://raw.githubusercontent.com/iniziare/Userstyle-I-ll-Be-There-For-You/main/bethereforyou.user.css
 ==/UserStyle== */
 
-/* ------------------------------------------------------------
-   SCOPE  —  where this style applies.
-   domain("tumblr.com") means EVERYWHERE on Tumblr: www.tumblr.com
-   (dashboard, blogs, inbox, settings, likes…) AND every subdomain
-   (e.g. a blog served at name.tumblr.com). It's the widest, cleanest
-   match, and the right pick for "all of Tumblr".
-
-   For reference, the other Stylus options are narrower:
-     - url-prefix("https://www.tumblr.com/")  → only URLs that START
-       with that exact prefix: www + https only, and misses subdomains.
-     - url("https://www.tumblr.com/dashboard") → one exact page only.
-     - regexp("...")                          → custom pattern matching.
-   Stick with domain() unless you ever want to deliberately narrow it.
-   ------------------------------------------------------------ */
 @-moz-document url-prefix("https://www.tumblr.com/") {
 
   /* ============================================================
@@ -29,6 +15,7 @@
      Want a different dark? Change --dark-bg (and the -rgb twin)
      in this one spot and the whole site follows.
      ============================================================ */
+    
   :root {
     --dark-bg:      #202020;                    /* the one background colour        */
     --dark-bg-rgb:  32, 32, 32;                 /* SAME colour as an R,G,B triplet   */
@@ -39,6 +26,13 @@
 
     --post-bg:      #ffffff;                    /* post cards stay white             */
     --post-fg:      #000000;                    /* text inside the white post cards  */
+    --black:        0, 0, 0;                    /* RGB triplet — some Tumblr icons (e.g.
+                                                    the "Text" post-type icon) reference
+                                                    var(--black) directly via an inline
+                                                    style (--icon-color-primary:RGB(var(
+                                                    --black))). Undefined until now, so it
+                                                    resolved to nothing and the icon went
+                                                    invisible on the white toolbar. */
 
     --corner:       0px;                        /* card corners: 0 = pointy, e.g. 8px = rounded */
     --line:         rgba(255, 255, 255, 0.09);  /* subtle border / divider colour on dark */
@@ -105,6 +99,10 @@
        and other blue spots elsewhere on the dashboard still pending. */
     --content-ui:          var(--dark-bg);
     --content-ui-hover:    var(--tab-active);
+    --content-ui-fg:       var(--main-fg);  /* text on the selected tab —
+                                                was unset, defaulting to a
+                                                dark color that vanished
+                                                against the dark tab bg */
     --content-tint:        var(--tab-idle);
     --content-tint-strong: var(--tab-hover-tint);
 
@@ -130,10 +128,13 @@
     --brand-blue:         var(--dark-bg);
     --brand-blue-hover:   #333333;
 
-    /* de-blue toggle switches / checkboxes — "on" state uses --blue.
-       White = "lit up" on dark chrome, consistent with active tab
-       underline and notification badge. "Off" stays its natural grey. */
-    --blue:               120, 120, 120;
+    /* --blue is intentionally left UNSET here (no override) so
+       Tumblr's own native value flows through untouched. Tumblr
+       reads it directly for things like the "Chat" post-type icon
+       (--icon-color-primary:RGB(var(--blue))) — a prior version of
+       this sheet forced --blue to grey for toggle switches, but
+       those were moved to their own dedicated colors in section 22,
+       so nothing here needs --blue overridden anymore. */
   }
 
   /* POST NOW BUTTON — the .xved4 wrapper uses background:var(--accent)
@@ -537,6 +538,8 @@
     color: var(--chrome-fg-secondary) !important;
   }
 
+  /* (blog-list spacing consolidated into section 24, below) */
+
   /* XKit modals (Tag Replacer, Limit Checker, etc.) — breathing room
      + subtle border to frame against the dashboard. All XKit popups
      render inside #xkit-modal[role="dialog"]. */
@@ -722,6 +725,111 @@
   label[aria-checked="true"] span.UZrDG,
   label:has(input[aria-checked="true"]) span.UZrDG {
     background-color: var(--dark-bg) !important;
+  }
+
+  /* ============================================================
+     23. ACTIVITY POPOVER CARD  —  fix black/transparent background
+     .AzqQv (the popover card wrapping the "All / Mentions / Reblogs
+     / Replies" activity panel) sets background:var(--content-fg).
+     --content-fg is meant for TEXT color (wired to var(--post-fg),
+     pure black) — Tumblr appears to reuse it for this card's
+     background too, so the card was rendering black at reduced
+     opacity (reads as a blue-grey wash over the page behind it,
+     not a real grey). Force an explicit solid white background,
+     matching every other light-surface card in this sheet.
+     Hashed class — flagged for refresh.
+     ============================================================ */
+  .AzqQv {
+    background: var(--post-bg) !important;
+  }
+
+  /* ============================================================
+     24. BLOG LIST SPACING  —  gap below "Check out these blogs"
+     ul.PwJi6 is the scrollable blog-recommendation list in the
+     right sidebar. No space separated it from the next sidebar
+     section (Limit Checker) below. The same class also appears on
+     an unrelated left-nav element, and Tumblr's own native rule on
+     THIS one ties our specificity, so [aria-label] (present on this
+     instance only) is added to win outright. Flat 50px, not tied to
+     --gap, per request. Hashed class — flagged for refresh.
+     ============================================================ */
+  ul.PwJi6[aria-label] {
+    margin-bottom: 50px !important;
+  }
+
+  /* ============================================================
+     25. LEFT NAV "BLOGS" HEADING  —  white + top margin
+     div.ddsmW wraps the "Blogs" <h4> heading and the "+ New" link
+     above the blog list in the account submenu (iniziare,
+     iniziare-resources, etc). Both go white to match other sidebar
+     headings (section 18b). The wrapper is already flex/row, so
+     align-items:center keeps "+ New" vertically aligned with
+     "Blogs" as intended. Hashed class — flagged.
+     ============================================================ */
+  div.ddsmW {
+    align-items: center !important;
+  }
+  div.ddsmW h4 {
+    color: var(--main-fg) !important;
+    font-weight: 700 !important;
+  }
+  div.ddsmW a {
+    color: var(--main-fg) !important;
+    font-weight: 700 !important;
+  }
+
+  /* ============================================================
+     26. FILTER BY TAG BUTTON  —  white + bold
+     button.TRX6J.oXcDI.R1h1i is the "Filter by tag" pill above the
+     Text/Photo/Quote/... row on the Your Tags dashboard tab. Its
+     text sits in span.EvhBA. NOTE: .TRX6J is Tumblr's generic
+     button class (also used by Cancel/Apply inside the tag-filter
+     modal — see section 27), so this must include the FULL class
+     chain, not just .TRX6J alone, or it leaks onto those buttons.
+     Hashed classes — flagged for refresh.
+     ============================================================ */
+  .TRX6J.oXcDI.R1h1i .EvhBA {
+    color: var(--main-fg) !important;
+    font-weight: 700 !important;
+  }
+
+  /* ============================================================
+     27. TAG-FILTER MODAL BUTTONS  —  Cancel / Clear / Apply
+     All three live inside the "Filter by tag" popup modal
+     (div.vO52p) — scoped strictly to that container so nothing
+     outside this modal is affected. Cancel and Apply are .TRX6J
+     buttons; Clear isn't (styled separately below since it wasn't
+     picking up the .TRX6J rule). All three get the same solid
+     dark-grey pill / white text treatment for visual consistency,
+     matching Apply's original look.
+     Hashed classes — flagged for refresh.
+     ============================================================ */
+  .vO52p .TRX6J,
+  .vO52p button {
+    background-color: var(--dark-bg) !important;
+    border: 1px solid var(--line) !important;
+    color: var(--main-fg) !important;
+    padding: 8px 12px !important;
+    min-width: 100px !important;
+    height: 40px !important;
+  }
+  .vO52p .TRX6J .EvhBA,
+  .vO52p button span {
+    color: var(--main-fg) !important;
+  }
+
+  /* ============================================================
+     28. REPLY-RESTRICTED ICON  —  dark grey, not blue
+     div[aria-label="Reply restricted"] wraps the small icon shown
+     next to "Replies are restricted for this post." Its SVG uses
+     --icon-color-primary:RGB(var(--blue)) inline — same --blue
+     token intentionally left at Tumblr's native blue (section 2)
+     so the Chat post-type icon stays blue. Can't touch --blue
+     globally without re-breaking that, so this icon is targeted
+     directly via its stable aria-label instead.
+     ============================================================ */
+  div[aria-label="Reply restricted"] svg {
+    --icon-color-primary: var(--dark-bg) !important;
   }
 
 }
