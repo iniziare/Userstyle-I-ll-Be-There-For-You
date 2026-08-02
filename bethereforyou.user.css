@@ -1,12 +1,26 @@
 /* ==UserStyle==
 @name           Tumblr Dashboard - I'll Be There For You
 @namespace      github.com/openstyles/stylus
-@version        1.3.0
-@description    Ground-up dark rebuild of the Tumblr dashboard. 
+@version        1.4.0
+@description    Ground-up dark rebuild of the Tumblr dashboard.
 @author         iniziare
 @updateURL      https://raw.githubusercontent.com/iniziare/Userstyle-I-ll-Be-There-For-You/main/bethereforyou.user.css
 ==/UserStyle== */
 
+/* ------------------------------------------------------------
+   SCOPE  —  where this style applies.
+   domain("tumblr.com") means EVERYWHERE on Tumblr: www.tumblr.com
+   (dashboard, blogs, inbox, settings, likes…) AND every subdomain
+   (e.g. a blog served at name.tumblr.com). It's the widest, cleanest
+   match, and the right pick for "all of Tumblr".
+
+   For reference, the other Stylus options are narrower:
+     - url-prefix("https://www.tumblr.com/")  → only URLs that START
+       with that exact prefix: www + https only, and misses subdomains.
+     - url("https://www.tumblr.com/dashboard") → one exact page only.
+     - regexp("...")                          → custom pattern matching.
+   Stick with domain() unless you ever want to deliberately narrow it.
+   ------------------------------------------------------------ */
 @-moz-document url-prefix("https://www.tumblr.com/") {
 
   /* ============================================================
@@ -15,7 +29,6 @@
      Want a different dark? Change --dark-bg (and the -rgb twin)
      in this one spot and the whole site follows.
      ============================================================ */
-    
   :root {
     --dark-bg:      #202020;                    /* the one background colour        */
     --dark-bg-rgb:  32, 32, 32;                 /* SAME colour as an R,G,B triplet   */
@@ -830,6 +843,25 @@
      ============================================================ */
   div[aria-label="Reply restricted"] svg {
     --icon-color-primary: var(--dark-bg) !important;
+  }
+
+  /* ============================================================
+     29. BLOG STATS SIDEBAR ALIGNMENT  —  remove stray left padding
+     The blog-page sidebar (Posts / Followers / Activity / Drafts /
+     Queue...) sits in div.FZkjV > aside.Vt7qF — same "div whose
+     direct child is an unid'd aside" shape targeted by the section
+     9/10 rule (div:has(> aside:not([id])) { padding-left: 10px }),
+     meant for the dashboard's right sidebar. This blog sidebar
+     matches that same selector and inherits padding it was never
+     meant to have, throwing off its alignment. Cancelled out here
+     rather than touching the shared rule, to avoid affecting the
+     dashboard sidebar it's actually meant for.
+     Hashed class — flagged for refresh.
+     ============================================================ */
+  div.FZkjV:has(> aside:not([id])) {
+    padding-left: 0 !important;
+    margin-left: 2px !important;
+    margin-bottom: 35px !important;
   }
 
 }
